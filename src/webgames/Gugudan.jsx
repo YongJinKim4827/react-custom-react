@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import HistoryList from './HistoryList';
 
 const Gugudan = () => {
     const [first, setFirst] = useState(Math.ceil(Math.random() * 9));
@@ -13,7 +14,7 @@ const Gugudan = () => {
         let correct = true;
         if(parseInt(inputValue) === first*second){
             setResult("정답!!")
-            setCorrectCount(correctCount + 1);
+            setCorrectCount(correctCount+1);
         }else{
             setResult("땡!!!");
             correct = false;
@@ -22,7 +23,7 @@ const Gugudan = () => {
             id : problemNo,
             first : first,
             second : second,
-            Answer : first * second,
+            answer : first * second,
             input : parseInt(inputValue),
             correct : correct
         }
@@ -47,6 +48,17 @@ const Gugudan = () => {
             return calculate();
         }
     }
+
+    const removeHistory = (id) => {
+        const removeItem = history.filter((e) => e.id === id);
+        setHistory(history.filter((e) => e.id !== id));
+        if(removeItem[0].correct){
+            if(correctCount > 0){
+                setCorrectCount(correctCount-1);
+            }
+        }
+    }
+
     return (
         <div>
             <div> 구구단 예제</div>
@@ -65,37 +77,7 @@ const Gugudan = () => {
             <div>
                 History [정답 확률 : {correctCount > 0 ? ((correctCount/history.length)*100).toFixed(1)+ "%": "0%"}]
             </div>
-            <div>
-                <table>
-                    <thead>
-                        <tr>
-                            <td style={{"width" : "100px", "textAlign" : "center"}}>
-                                문제
-                            </td>
-                            <td style={{"width" : "100px", "textAlign" : "center"}}>
-                                내가 입력한 값
-                            </td>
-                            <td style={{"width" : "100px", "textAlign" : "center"}}>
-                                정답
-                            </td>
-                            <td style={{"width" : "100px", "textAlign" : "center"}}>
-                                정답 유무
-                            </td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {history.map(item => {
-                        return (
-                            <tr key={item.id} style={item.correct ? {"backgroundColor" : "#CEF279"} : {"backgroundColor" : "#FFA7A7"}}>
-                            <td style={{"textAlign" : "center"}}>{item.first} X {item.second}</td>
-                            <td style={{"textAlign" : "center"}}>{item.input}</td>
-                            <td style={{"textAlign" : "center"}}>{item.Answer}</td>
-                            <td style={{"textAlign" : "center"}}>{item.correct ? "O" : "X"}</td>
-                            </tr>)
-                        })}
-                    </tbody>
-                </table>
-            </div>
+            <HistoryList items = {history} onClick = {removeHistory}/>
         </div>
     );
 };
