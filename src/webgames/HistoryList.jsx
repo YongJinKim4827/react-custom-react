@@ -24,7 +24,7 @@ const HistoryList = (props) => {
             <div>
                 {
                     props.items.map((item, idx) => {
-                        return <HistoryDetail key = {idx} item = {item} onClick = {props.onClick}/>
+                        return <HistoryDetail key = {idx} item = {item} onCancelRemove = {props.onCancelRemove} onSaveUpdate={props.onSaveUpdate} onUpdateChange={props.onUpdateChange}/>
                     })
                 }
             </div>

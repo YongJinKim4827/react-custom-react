@@ -9,6 +9,7 @@ const Gugudan = () => {
     const [history, setHistory] = useState([]);
     const [problemNo, setProblemNo] = useState(0);// 문제의 고유번호를 지정하기위해 사용
     const [correctCount, setCorrectCount] = useState(0);
+    const [updateInputVlaue, setUpdateInputValue] = useState(0);
 
     const calculate = () => {
         let correct = true;
@@ -25,7 +26,9 @@ const Gugudan = () => {
             second : second,
             answer : first * second,
             input : parseInt(inputValue),
-            correct : correct
+            copyInput : parseInt(inputValue),
+            correct : correct,
+            isUpdate : false
         }
         //History에 추가
         setHistory([problemItem, ...history])
@@ -42,6 +45,16 @@ const Gugudan = () => {
         setInputValue(e.target.value);
     }
 
+    const onUpdateChange = (e, item) => {
+        //이게 맞나..? 아닌거 같은데...
+        const updateIdx = history.findIndex((e) => e.id === item.id);
+        if(updateIdx !== -1){
+            const copyHistory = [...history];
+            copyHistory[updateIdx] = {...item, input : e.target.value};
+            setHistory(copyHistory);
+        }
+    }
+
     const onKeyDown = (e) => {
         //Enter 처리 및 빈 공백일 시, 동작하지 않음
         if(e.keyCode === 13 && e.target.value){
@@ -49,12 +62,33 @@ const Gugudan = () => {
         }
     }
 
-    const removeHistory = (id) => {
-        const removeItem = history.filter((e) => e.id === id);
-        setHistory(history.filter((e) => e.id !== id));
-        if(removeItem[0].correct){
-            if(correctCount > 0){
-                setCorrectCount(correctCount-1);
+    const onCancelRemove = (item) => {
+        if(item.isUpdate){
+
+        }else{
+            setHistory(history.filter((e) => e.id !== item.id));
+            if(item.correct){
+                if(correctCount > 0){
+                    setCorrectCount(correctCount-1);
+                }
+            }
+        }
+    }
+
+    const onSaveUpdate = (item) => {
+        if(item.isUpdate){
+            const saveIdx = history.findIndex((e)=> e.id === item.id);
+            const copyHistory = [...history];
+            if(saveIdx != -1){
+                copyHistory[saveIdx] = {...item, isUpdate : false, copyInput : parseInt(item.input)};
+                setHistory(copyHistory);
+            }
+        }else{
+            const updateIdx = history.findIndex((e)=> e.id === item.id);
+            const copyHistory = [...history];
+            if(updateIdx != -1){
+                copyHistory[updateIdx] = {...item, isUpdate : true};
+                setHistory(copyHistory);
             }
         }
     }
@@ -77,7 +111,7 @@ const Gugudan = () => {
             <div>
                 History [정답 확률 : {correctCount > 0 ? ((correctCount/history.length)*100).toFixed(1)+ "%": "0%"}]
             </div>
-            <HistoryList items = {history} onClick = {removeHistory}/>
+            <HistoryList items = {history} onCancelRemove={onCancelRemove} onSaveUpdate = {onSaveUpdate} onUpdateChange={onUpdateChange}/>
         </div>
     );
 };
